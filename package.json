@@ -1,0 +1,22 @@
+{
+  "name": "custom-kit",
+  "version": "1.0.9",
+  "main": "dist/custom-kit.umd.js",
+  "module": "dist/custom-kit.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/custom-kit.es.js",
+      "require": "./dist/custom-kit.umd.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "peerDependencies": {
+    "vue": "^3.0.0"
+  }
+}
