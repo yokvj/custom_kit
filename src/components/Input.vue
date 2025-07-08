@@ -4,9 +4,10 @@
       v-model="value"
       :placeholder="placeholder"
       @input="onInput"
+      @blur="onInput"
       :type="type"
       class="custom-input"
-      :style="inputStyle"
+      :style="[inputStyle, error.value ? errorBorderStyle : {}]"
     />
     <p v-if="error" class="error-text">{{ error }}</p>
   </div>
@@ -55,7 +56,7 @@ const emit = defineEmits(["update:modelValue"]);
 const value = ref(props.modelValue || "");
 const error = ref("");
 
-// Sync internal value with parent
+// Watch for external changes
 watch(
   () => props.modelValue,
   (newVal) => {
@@ -63,23 +64,26 @@ watch(
   }
 );
 
-// Computed inline styles with !important
+// Computed input style
 const inputStyle = computed(() => ({
-  height: props.height ? `${props.height} !important` : "auto",
-  width: props.width ? `${props.width} !important` : "100%",
+  height: props.height || "auto",
+  width: props.width || "100%",
   display: props.display || "block",
   alignItems: props.alignItems || "center",
-  fontSize: props.fontSize ? `${props.fontSize} !important` : "14px",
+  fontSize: props.fontSize || "14px",
   padding: props.padding || "8px",
   margin: props.margin || "0",
   color: props.color || "#000",
-  backgroundColor: props.backgroundColor
-    ? `${props.backgroundColor} !important`
-    : "#fff",
+  backgroundColor: props.backgroundColor || "#fff",
   border: props.border || "1px solid #ccc",
   borderRadius: props.borderRadius || "6px",
   boxSizing: "border-box",
 }));
+
+// Border style when there's an error
+const errorBorderStyle = {
+  border: "2px solid red",
+};
 
 const wrapperStyle = {
   width: "100%",
@@ -97,8 +101,10 @@ const validateField = () => {
         return props.errorMessages.email;
       }
     }
-    if (rule === "number" && isNaN(value.value)) {
-      return props.errorMessages.number;
+    if (rule === "number") {
+      if (value.value === "" || isNaN(value.value)) {
+        return props.errorMessages.number;
+      }
     }
     if (rule === "password" && value.value.length < 6) {
       return props.errorMessages.password;
@@ -125,11 +131,10 @@ const onInput = () => {
 
 .error-text {
   color: #e53e3e !important;
-  font-size: 12px;
-  margin-top: 4px;
+  font-size: 14px;
+  margin-top: 6px;
 }
 
-/* Responsive font fallback */
 @media (max-width: 768px) {
   .custom-input {
     font-size: 13px !important;
